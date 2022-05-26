@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Go fullstack</title>
+    <script src="/wasm_exec.js"></script>
+    <script>
+        "use strict";
+        if (!WebAssembly.instantiateStreaming) {
+            // polyfill
+            WebAssembly.instantiateStreaming = (fetchResp, importObject) => fetchResp
+                .then(resp => resp.arrayBuffer())
+                .then(source => WebAssembly.instantiate(source, importObject));
+        }
+
+        const go = new Go();
+        let mod, inst;
+        WebAssembly.instantiateStreaming(fetch("/lib.wasm"), go.importObject)
+            .then(result => {
+                mod = result.module;
+                inst = result.instance;
+
+                return inst
+            })
+            .then((inst) => go.run(inst));
+    </script>
+</head>
+<body>
+</body>
+</html>
